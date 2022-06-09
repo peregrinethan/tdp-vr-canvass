@@ -102,7 +102,7 @@ if address:
                          ),
                          pdk.Layer(
                              'ScatterplotLayer',
-                             data=df,
+                             data=df_canvass,
                              get_position='[lon, lat]',
                              get_color='[200, 30, 0, 160]',
                              get_radius=200,
