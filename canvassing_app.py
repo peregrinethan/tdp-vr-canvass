@@ -81,6 +81,6 @@ if address:
                 st.map(df_canvass)
 
                 st.subheader('Raw data')
-                st.write(df_canvass.sort_values(by=['lat','address','unit']).drop(columns=['unit_acct_id','lat','lon']))
+                st.write(df_canvass.sort_values(by=['lat','address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
             except AttributeError:
                 st.text("Address not found. Please check address and/or enter another.")
