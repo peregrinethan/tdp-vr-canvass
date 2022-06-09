@@ -91,7 +91,7 @@ if address:
                      layers=[
                          pdk.Layer(
                             'HexagonLayer',
-                            data=df,
+                            data=df_canvass,
                             get_position='[lon, lat]',
                             radius=200,
                             elevation_scale=4,
