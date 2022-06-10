@@ -34,11 +34,9 @@ rows = run_query(f'SELECT * FROM "{sheet_url}"')
 ls = []
 for row in rows:
     ls.append(row[0])
-st.write(ls)
-
 
 def check_email():
-    """Returns `True` if the user had the correct password."""
+    """Returns `True` if the user is with an email we are aware of."""
 
     def email_entered():
         """Checks whether a password entered by the user is correct."""
@@ -50,12 +48,12 @@ def check_email():
 
     if "email_correct" not in st.session_state:
         st.text_input(
-            "Email", type="email", on_change=email_entered, key="email"
+            "Email", on_change=email_entered
         )
         return False
-    elif not st.session_state["password_correct"]:
+    elif not st.session_state["email_correct"]:
         st.text_input(
-            "Email", type="email", on_change=email_entered, key="email"
+            "Email", on_change=email_entered
         )
         st.error("Not authorized to enter. Please contact organizer.")
         return False
