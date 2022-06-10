@@ -112,7 +112,7 @@ if submitted:
     df = st.dataframe(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
 
     with st.sidebar.form("checked_addr"):
-        options = st.sidebar.multiselect('Address row visited', range(50))
+        options = st.multiselect('Address row visited', range(50))
 
         # Every form must have a submit button.
         submitted_2 = st.form_submit_button("Submit")
