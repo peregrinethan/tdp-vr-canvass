@@ -3,9 +3,13 @@ import streamlit as st
 import pandas as pd
 import pandas_gbq
 import pydeck as pdk
+import requests
 
 from google.oauth2 import service_account
 from geopy.geocoders import Nominatim
+
+# print response
+print(response.text)
 
 #### INITIALIZE ####
 credentials = service_account.Credentials.from_service_account_info(
@@ -42,8 +46,10 @@ def check_password():
         return True
 
 if check_password():
+    response = requests.get('https://share.streamlit.io/api/v1/user')
+    st.write(response.text)
     app_title = st.title('Which address will you start canvassing from?')
-    data_load_state = st.text("Please enter an address in the sidebar\nClick the error if necessary")
+    data_load_state = st.text("Please enter an address in the sidebar\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
     # @st.experimental_memo()
     # Rerun only if query changes
