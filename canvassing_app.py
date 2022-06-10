@@ -3,54 +3,67 @@ import streamlit as st
 import pandas as pd
 import pandas_gbq
 import pydeck as pdk
-import requests
 
 from google.oauth2 import service_account
 from geopy.geocoders import Nominatim
 
 #### INITIALIZE ####
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["tdp_service_account"]
+credentials_bq = service_account.Credentials.from_service_account_info(
+    st.secrets["tdp_service_account_bq"]
+)
+credentials_gs = service_account.Credentials.from_service_account_info(
+    st.secrets["tdp_service_account_gs"],
+    scopes=[
+        "https://www.googleapis.com/auth/spreadsheets",
+    ],
 )
 
+conn = connect(credentials=credentials_gs)
+
 #### APP AND DISPLAY SETTINGS ####
-def check_password():
+@st.cache(ttl=600)
+def run_query(query):
+    rows = conn.execute(query, headers=1)
+    rows = rows.fetchall()
+    return rows
+
+sheet_url = st.secrets["private_gsheets_url"]
+rows = run_query(f'SELECT * FROM "{sheet_url}"')
+
+ls = []
+for row in rows:
+    ls = ls.append(row)
+
+
+def check_email():
     """Returns `True` if the user had the correct password."""
 
-    def password_entered():
+    def email_entered():
         """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == st.secrets["password"]:
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # don't store password
+        if st.session_state["email"] in ls:
+            st.session_state["email_correct"] = True
+            del st.session_state["email"]  # don't store password
         else:
-            st.session_state["password_correct"] = False
+            st.session_state["email_correct"] = False
 
-    if "password_correct" not in st.session_state:
-        # First run, show input for password.
+    if "email_correct" not in st.session_state:
         st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
+            "Email", type="email", on_change=email_entered, key="email"
         )
         return False
     elif not st.session_state["password_correct"]:
-        # Password not correct, show input + error.
         st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
+            "Email", type="email", on_change=email_entered, key="email"
         )
-        st.error("😕 Password incorrect")
+        st.error("Not authorized to enter. Please contact organizer.")
         return False
     else:
-        # Password correct.
         return True
 
-if check_password():
-    response = requests.get('https://share.streamlit.io/peregrinethan/tdp-vr-canvass/main/canvassing_app.py')
-    st.write(response.headers) 
-    st.write(response.text)
+if check_email():
     app_title = st.title('Which address will you start canvassing from?')
     data_load_state = st.text("Please enter an address in the sidebar\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
-    # @st.experimental_memo()
-    # Rerun only if query changes
     def load_data(lon, lat):
         unreg_query = f"""
         SELECT
@@ -74,7 +87,7 @@ if check_password():
             LIMIT 50
         """
 
-        data = pandas_gbq.read_gbq(unreg_query, credentials=credentials)
+        data = pandas_gbq.read_gbq(unreg_query, credentials=credentials_bq)
         data = data.assign(
             lat=lambda df: df['lat'].astype(float),
             lon=lambda df: df['lon'].astype(float)
