@@ -109,7 +109,8 @@ if submitted:
 
 
     st.subheader('Raw data')
-    df = st.dataframe(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
+    df_canvass_sort = df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True)
+    df = st.dataframe(df_canvass_sort)
 
     with st.sidebar.form("checked_addr"):
         options = st.multiselect('Address row visited', range(50))
@@ -117,4 +118,4 @@ if submitted:
         # Every form must have a submit button.
         submitted_2 = st.form_submit_button("Submit")
         if submitted_2:
-            df.dataframe(df.loc[~df.index.isin(options)].sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
+            df.dataframe(df_canvass_sort.loc[~df_canvass_sort.index.isin(options)])
