@@ -34,7 +34,7 @@ rows = run_query(f'SELECT * FROM "{sheet_url}"')
 ls = []
 for row in rows:
     # ls = ls.append(row.emails)
-    st.write(row)
+    st.write(row['emails'])
 
 
 def check_email():
