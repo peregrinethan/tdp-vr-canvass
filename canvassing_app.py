@@ -43,7 +43,7 @@ def check_password():
 
 if check_password():
     app_title = st.title('Which address will you start canvassing from?')
-    data_load_state = st.text("Please enter an address in the sidebar")
+    data_load_state = st.text("Please enter an address in the sidebar\nClick the error if necessary")
 
     # @st.experimental_memo()
     # Rerun only if query changes
