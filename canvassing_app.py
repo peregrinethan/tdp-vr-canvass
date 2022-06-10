@@ -83,7 +83,7 @@ if address:
 
                 st.pydeck_chart(pdk.Deck(
                      # map_style='mapbox://styles/mapbox/light-v9',
-                     map_style='mapbox://styles/mapbox/streets-v11'
+                     map_style='mapbox://styles/mapbox/streets-v11',
                      initial_view_state=pdk.ViewState(
                          latitude=df_canvass['lat'].min(),
                          longitude=-df_canvass['lon'].min(),
