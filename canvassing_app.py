@@ -8,9 +8,6 @@ import requests
 from google.oauth2 import service_account
 from geopy.geocoders import Nominatim
 
-# print response
-print(response.text)
-
 #### INITIALIZE ####
 credentials = service_account.Credentials.from_service_account_info(
     st.secrets["tdp_service_account"]
