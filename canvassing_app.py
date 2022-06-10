@@ -82,10 +82,11 @@ if address:
                 # st.map(df_canvass)
 
                 st.pydeck_chart(pdk.Deck(
-                     map_style='mapbox://styles/mapbox/light-v9',
+                     # map_style='mapbox://styles/mapbox/light-v9',
+                     map_style='mapbox://styles/mapbox/streets-v11'
                      initial_view_state=pdk.ViewState(
-                         latitude=df_canvass['lat'].mean(),
-                         longitude=-df_canvass['lon'].mean(),
+                         latitude=df_canvass['lat'].min(),
+                         longitude=-df_canvass['lon'].min(),
                          zoom=11,
                          pitch=50,
                      ),
@@ -105,11 +106,11 @@ if address:
                              data=df_canvass,
                              get_position='[lon, lat]',
                              get_color='[200, 30, 0, 160]',
-                             get_radius=20,
+                             get_radius=15,
                              opacity=0.5,
                          ),
                      ],
-                     tooltip={"text": "{address} {city}, TX {zip}\n{unit_type} {unit}"}
+                     tooltip={"text": f"{df_canvass['address']} {df_canvass['city']}, TX {df_canvass['zip']}\n{df_canvass['unit_type']} {df_canvass['unit']}"}
                  ))
 
 
