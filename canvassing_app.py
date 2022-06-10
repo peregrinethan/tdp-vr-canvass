@@ -105,5 +105,5 @@ if submitted:
      ))
 
     st.subheader('Raw data')
-    df_canvass_sort = df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True)
+    df_canvass_sort = df_canvass.sort_values(by=['lat','lon','address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True)
     df = st.dataframe(df_canvass_sort)
