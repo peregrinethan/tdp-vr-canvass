@@ -43,7 +43,8 @@ def check_password():
         return True
 
 if check_password():
-    response = requests.get('https://share.streamlit.io/api/v1/user')
+    response = requests.get('https://share.streamlit.io/peregrinethan/tdp-vr-canvass/main/canvassing_app.py')
+    st.write(response.headers) 
     st.write(response.text)
     app_title = st.title('Which address will you start canvassing from?')
     data_load_state = st.text("Please enter an address in the sidebar\nClick the arrow in the top left, if necessary, to show the sidebar.")
