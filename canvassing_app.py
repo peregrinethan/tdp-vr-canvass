@@ -87,8 +87,8 @@ if address:
                      initial_view_state=pdk.ViewState(
                          latitude=df_canvass['lat'].min(),
                          longitude=df_canvass['lon'].min(),
-                         zoom=11,
-                         pitch=50,
+                         zoom=2,
+                         pitch=0,
                      ),
                      layers=[
                          # pdk.Layer(
