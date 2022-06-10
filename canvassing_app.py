@@ -106,5 +106,4 @@ if submitted:
 
     st.subheader('Raw data')
     df_canvass_sort = df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True)
-    options = st.multiselect('Address row visited', range(50))
     df = st.dataframe(df_canvass_sort)
