@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import pandas_gbq
 import pydeck as pdk
+from gsheetsdb import connect
 
 from google.oauth2 import service_account
 from geopy.geocoders import Nominatim
