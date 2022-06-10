@@ -15,10 +15,20 @@ credentials = service_account.Credentials.from_service_account_info(
 
 #### APP AND DISPLAY SETTINGS ####
 st.title('Addresses to canvass')
-st.header('Which address will you start canvassing from?')
-address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
-city = st.text_input(label='City', placeholder='ex: Houston')
-zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
+
+with st.form("Which address will you start canvassing from?"):
+    address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
+    city = st.text_input(label='City', placeholder='ex: Houston')
+    zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
+
+    # Every form must have a submit button.
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        st.write("slider", slider_val, "checkbox", checkbox_val)
+
+
+# st.header('Which address will you start canvassing from?')
+
 
 @st.experimental_memo()
 # Rerun only if query changes
@@ -66,44 +76,53 @@ def check_zip(zip):
     except ValueError:
         st.text('Please input only numeric values for zip code.')
 
-if address:
-    if city:
-        if zip:
-            check_zip(zip)
-            try:
-                lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
 
-                st.header('Addresses and Locations to canvass')
-                data_load_state = st.text('Loading data...')
-                df_canvass = load_data(lon=lon, lat=lat)
-                data_load_state.text("")
+with st.sidebar.form("Which address will you start canvassing from?"):
+    address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
+    city = st.text_input(label='City', placeholder='ex: Houston')
+    zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
 
-                st.subheader(f'Addresses within 0.5 miles of {addr}')
+    # Every form must have a submit button.
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        if address:
+            if city:
+                if zip:
+                    check_zip(zip)
+                    try:
+                        lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
 
-                st.pydeck_chart(pdk.Deck(
-                     map_style='mapbox://styles/mapbox/streets-v11',
-                     initial_view_state=pdk.ViewState(
-                         latitude=df_canvass['lat'].mean(),
-                         longitude=df_canvass['lon'].mean(),
-                         zoom=14,
-                         pitch=0,
-                     ),
-                     layers=[
-                         pdk.Layer(
-                             'ScatterplotLayer',
-                             data=df_canvass,
-                             get_position='[lon, lat]',
-                             get_color='[69, 47, 110]',
-                             get_radius=16,
-                             opacity=0.5,
-                         ),
-                     ],
-                     # tooltip={"text": f"{df_canvass['address']} {df_canvass['city']}, TX {df_canvass['zip']}\n{df_canvass['unit_type']} {df_canvass['unit']}"}
-                 ))
+                        st.header('Addresses and Locations to canvass')
+                        data_load_state = st.text('Loading data...')
+                        df_canvass = load_data(lon=lon, lat=lat)
+                        data_load_state.text("")
+
+                        st.subheader(f'Addresses within 0.5 miles of {addr}')
+
+                        st.pydeck_chart(pdk.Deck(
+                             map_style='mapbox://styles/mapbox/streets-v11',
+                             initial_view_state=pdk.ViewState(
+                                 latitude=df_canvass['lat'].mean(),
+                                 longitude=df_canvass['lon'].mean(),
+                                 zoom=14,
+                                 pitch=0,
+                             ),
+                             layers=[
+                                 pdk.Layer(
+                                     'ScatterplotLayer',
+                                     data=df_canvass,
+                                     get_position='[lon, lat]',
+                                     get_color='[69, 47, 110]',
+                                     get_radius=16,
+                                     opacity=0.5,
+                                 ),
+                             ],
+                             # tooltip={"text": f"{df_canvass['address']} {df_canvass['city']}, TX {df_canvass['zip']}\n{df_canvass['unit_type']} {df_canvass['unit']}"}
+                         ))
 
 
 
-                st.subheader('Raw data')
-                st.write(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
-            except AttributeError:
-                st.text("Address not found. Please check address and/or enter another.")
+                        st.subheader('Raw data')
+                        st.write(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
+                    except AttributeError:
+                        st.text("Address not found. Please check address and/or enter another.")
