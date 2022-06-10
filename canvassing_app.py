@@ -16,25 +16,6 @@ credentials = service_account.Credentials.from_service_account_info(
 #### APP AND DISPLAY SETTINGS ####
 st.title('Addresses to canvass')
 
-with st.sidebar.form("Which address will you start canvassing from?"):
-    address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
-    city = st.text_input(label='City', placeholder='ex: Houston')
-    zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
-
-    # Every form must have a submit button.
-    submitted = st.form_submit_button("Submit")
-    if submitted:
-        try:
-            lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-            st.write(lat,lon, addr)
-        except AttributeError:
-            st.text("Address not found. Please check address and/or enter another.")
-
-
-
-# st.header('Which address will you start canvassing from?')
-
-
 @st.experimental_memo()
 # Rerun only if query changes
 def load_data(lon, lat):
@@ -81,10 +62,26 @@ def check_zip(zip):
     except ValueError:
         st.text('Please input only numeric values for zip code.')
 
+with st.sidebar.form("Which address will you start canvassing from?"):
+    address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
+    city = st.text_input(label='City', placeholder='ex: Houston')
+    zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
+
+    # Every form must have a submit button.
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        check_zip(zip)
+        try:
+            lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
+            st.write(lat,lon, addr)
+        except AttributeError:
+            st.text("Address not found. Please check address and/or enter another.")
+
+
 # if address:
 #     if city:
 #         if zip:
-#             check_zip(zip)
+#
 #             try:
 #                 lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
 #
