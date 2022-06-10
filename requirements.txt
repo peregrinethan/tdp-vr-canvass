@@ -5,3 +5,4 @@ pandas==1.1.5
 pandas-gbq==0.17.5
 pydeck==0.7.1
 streamlit==1.9.0
+requests==2.23.0
