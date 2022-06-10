@@ -118,4 +118,4 @@ if submitted:
         # Every form must have a submit button.
         submitted_2 = st.form_submit_button("Submit")
         if submitted_2:
-            df.dataframe(df_canvass_sort.loc[~df_canvass_sort.index.isin(options)])
+            df = st.dataframe(df_canvass_sort.loc[~df_canvass_sort.index.isin(options)])
