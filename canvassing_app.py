@@ -16,7 +16,8 @@ credentials = service_account.Credentials.from_service_account_info(
 app_title = st.title('Which address will you start canvassing from?')
 data_load_state = st.text("Please enter an address in the sidebar")
 
-@st.experimental_memo()
+# @st.experimental_memo()
+@st.cache()
 # Rerun only if query changes
 def load_data(lon, lat):
     unreg_query = f"""
