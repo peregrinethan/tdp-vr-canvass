@@ -79,34 +79,22 @@ if address:
                 data_load_state.text("")
 
                 st.subheader(f'Addresses within 0.5 miles of {addr}')
-                # st.map(df_canvass)
 
                 st.pydeck_chart(pdk.Deck(
-                     # map_style='mapbox://styles/mapbox/light-v9',
                      map_style='mapbox://styles/mapbox/streets-v11',
                      initial_view_state=pdk.ViewState(
-                         latitude=df_canvass['lat'].min(),
-                         longitude=df_canvass['lon'].min(),
+                         latitude=df_canvass['lat'].mean(),
+                         longitude=df_canvass['lon'].mean(),
                          zoom=14,
                          pitch=0,
                      ),
                      layers=[
-                         # pdk.Layer(
-                         #    'HexagonLayer',
-                         #    data=df_canvass,
-                         #    get_position='[lon, lat]',
-                         #    radius=200,
-                         #    elevation_scale=4,
-                         #    elevation_range=[0, 1000],
-                         #    pickable=True,
-                         #    extruded=True,
-                         # ),
                          pdk.Layer(
                              'ScatterplotLayer',
                              data=df_canvass,
                              get_position='[lon, lat]',
-                             get_color='[200, 30, 0, 160]',
-                             get_radius=15,
+                             get_color='[69, 47, 110]',
+                             get_radius=16,
                              opacity=0.5,
                          ),
                      ],
@@ -116,6 +104,6 @@ if address:
 
 
                 st.subheader('Raw data')
-                st.write(df_canvass.sort_values(by=['lat','address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
+                st.write(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
             except AttributeError:
                 st.text("Address not found. Please check address and/or enter another.")
