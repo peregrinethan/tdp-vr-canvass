@@ -86,7 +86,7 @@ if address:
                      map_style='mapbox://styles/mapbox/streets-v11',
                      initial_view_state=pdk.ViewState(
                          latitude=df_canvass['lat'].min(),
-                         longitude=-df_canvass['lon'].min(),
+                         longitude=df_canvass['lon'].min(),
                          zoom=11,
                          pitch=50,
                      ),
@@ -110,7 +110,7 @@ if address:
                              opacity=0.5,
                          ),
                      ],
-                     tooltip={"text": f"{df_canvass['address']} {df_canvass['city']}, TX {df_canvass['zip']}\n{df_canvass['unit_type']} {df_canvass['unit']}"}
+                     # tooltip={"text": f"{df_canvass['address']} {df_canvass['city']}, TX {df_canvass['zip']}\n{df_canvass['unit_type']} {df_canvass['unit']}"}
                  ))
 
 
