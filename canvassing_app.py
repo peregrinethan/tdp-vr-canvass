@@ -7,7 +7,6 @@ import pydeck as pdk
 from google.oauth2 import service_account
 from geopy.geocoders import Nominatim
 
-
 #### INITIALIZE ####
 credentials = service_account.Credentials.from_service_account_info(
     st.secrets["tdp_service_account"]
@@ -78,7 +77,6 @@ with st.sidebar.form("start_address"):
             st.text("Address not found. Try again.")
             submitted = False
 
-
 if submitted:
     app_title.title('Addresses and Locations to canvass')
     data_load_state.text('Loading data...')
@@ -106,16 +104,7 @@ if submitted:
          ],
      ))
 
-
-
     st.subheader('Raw data')
     df_canvass_sort = df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True)
+    options = st.multiselect('Address row visited', range(50))
     df = st.dataframe(df_canvass_sort)
-
-    with st.sidebar.form("checked_addr"):
-        options = st.multiselect('Address row visited', range(50))
-
-        # Every form must have a submit button.
-        submitted_2 = st.form_submit_button("Submit")
-        if submitted_2:
-            df = st.dataframe(df_canvass_sort.loc[~df_canvass_sort.index.isin(options)])
