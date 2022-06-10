@@ -74,7 +74,6 @@ with st.sidebar.form("start_address"):
         check_zip(zip)
         try:
             lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-            st.write(lat,lon, addr)
         except AttributeError:
             st.text("Address not found. Try again.")
             submitted = False
@@ -110,4 +109,12 @@ if submitted:
 
 
     st.subheader('Raw data')
-    st.dataframe(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
+    df = st.dataframe(df_canvass.sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
+
+    with st.sidebar.form("checked_addr"):
+        options = st.sidebar.multiselect('Address row visited', range(50))
+
+        # Every form must have a submit button.
+        submitted_2 = st.form_submit_button("Submit")
+        if submitted_2:
+            df.dataframe(df.loc[~df.index.isin(options)].sort_values(by=['address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True))
