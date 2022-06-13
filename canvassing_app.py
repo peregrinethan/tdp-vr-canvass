@@ -132,9 +132,9 @@ if check_email():
         submitted = st.form_submit_button("Submit")
         if submitted:
             if check_zip(zip):
+                found = True
                 try:
                     lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-                    found = True
                 except AttributeError:
                     st.text("Address not found. Try again.")
                     found = False
