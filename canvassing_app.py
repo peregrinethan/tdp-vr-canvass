@@ -118,7 +118,7 @@ if check_email():
             int(zip)
             result = True
         except ValueError:
-            st.text('Please input only numeric values for zip code.')
+            st.text('Zip must be numeric.')
             result = False
 
         return result
@@ -131,13 +131,13 @@ if check_email():
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
         if submitted:
-            if check_zip(zip):
+            if city and check_zip(zip):
                 try:
                     lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
                 except AttributeError:
-                    st.text("Address not found. Try again.")
+                    not_found = st.text("Address not found. Try again.")
 
-    if lat:
+    if submitted and not not_found:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
         df_canvass = load_data(lon=lon, lat=lat)
@@ -152,7 +152,7 @@ if check_email():
                  initial_view_state=pdk.ViewState(
                      latitude=df_canvass['lat'].mean(),
                      longitude=df_canvass['lon'].mean(),
-                     zoom=14,
+                     zoom=16,
                      pitch=0,
                  ),
                  layers=[
