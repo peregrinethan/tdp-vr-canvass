@@ -62,7 +62,7 @@ def check_email():
 
 if check_email():
     app_title = st.title('Which address will you start canvassing from?')
-    data_load_state = st.text("Please enter an address in the sidebar\nClick the arrow in the top left, if necessary, to show the sidebar.")
+    data_load_state = st.text("Please enter an address in the sidebar.\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
     def load_data(lon, lat):
         unreg_query = f"""
