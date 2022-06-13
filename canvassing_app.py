@@ -143,8 +143,10 @@ if check_email():
                         lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
                 else:
                     st.text('Zip must be numeric.')
+                    submitted = False
             else:
                 st.text('Please enter a city')
+                submitted = False
 
     if submitted:
         app_title.title('Addresses and Locations to canvass')
