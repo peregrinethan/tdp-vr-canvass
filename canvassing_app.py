@@ -134,6 +134,7 @@ if check_email():
             if check_zip(zip):
                 try:
                     lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
+                    st.write(submitted)
                 except AttributeError:
                     st.text("Address not found. Try again.")
                     submitted = False
