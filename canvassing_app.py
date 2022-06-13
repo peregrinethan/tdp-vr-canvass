@@ -130,7 +130,7 @@ if check_email():
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
-        found = False
+        # found = False
         if submitted:
             if city:
                 if check_zip(zip):
@@ -140,13 +140,13 @@ if check_email():
                         st.text("Address not found. Try again.")
                     else:
                         lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-                        found = True
+                        submitted = True
                 else:
                     st.text('Zip must be numeric.')
             else:
                 st.text('Please enter a city')
 
-    if submitted and found:
+    if submitted:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
         df_canvass = load_data(lon=lon, lat=lat)
