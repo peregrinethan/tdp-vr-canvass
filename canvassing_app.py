@@ -66,7 +66,7 @@ if check_email():
 
     def load_data(lon, lat):
         unreg_query = f"""
-        SELECT
+        WITH addresses AS (SELECT
           p.unit_acct_id,
           l.latitude as lat,
           l.longitude as lon,
@@ -74,7 +74,8 @@ if check_email():
           unit_type,
           unit,
           city,
-          zip
+          zip,
+          ST_DISTANCE(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC))) AS distance
         FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
         JOIN `demstxsp.vr_data.harris_parcel_lat_lng` l
           USING (unit_acct_id)
@@ -83,8 +84,12 @@ if check_email():
         WHERE
             p.predicted_tdp_partisanship_range = "70-100"
             AND l.latitude IS NOT NULL
-            AND ST_DWITHIN(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC)), 802)
-            LIMIT 50
+            AND ST_DWITHIN(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC)), 10000)
+        )
+        SELECT *
+        FROM addresses
+        ORDER BY distance
+        LIMIT 50
         """
 
         data = pandas_gbq.read_gbq(unreg_query, credentials=credentials_bq)
@@ -96,6 +101,9 @@ if check_email():
         return data
 
     def geocode_add(address,city,zip):
+        '''This function takes an address in street number + street format, a city,
+        and a zip, and returns the geocoded latitude and longitude.
+        '''
         addr = f'{address + " " + city + ", TX " + zip}'
         locator = Nominatim(user_agent="address_nearby")
         location = locator.geocode(f"{addr}")
@@ -126,30 +134,33 @@ if check_email():
     if submitted:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
-        df_canvass = load_data(lon=lon, lat=lat)
-        data_load_state.text("")
+        try:
+            df_canvass = load_data(lon=lon, lat=lat)
+            data_load_state.text("")
 
-        st.subheader(f'Addresses within 0.5 miles of {addr}')
-        st.pydeck_chart(pdk.Deck(
-             map_style='mapbox://styles/mapbox/streets-v11',
-             initial_view_state=pdk.ViewState(
-                 latitude=df_canvass['lat'].mean(),
-                 longitude=df_canvass['lon'].mean(),
-                 zoom=14,
-                 pitch=0,
-             ),
-             layers=[
-                 pdk.Layer(
-                     'ScatterplotLayer',
-                     data=df_canvass,
-                     get_position='[lon, lat]',
-                     get_color='[69, 47, 110]',
-                     get_radius=16,
-                     opacity=0.5,
+            st.subheader(f'50 closest addresses to {addr}')
+            st.pydeck_chart(pdk.Deck(
+                 map_style='mapbox://styles/mapbox/streets-v11',
+                 initial_view_state=pdk.ViewState(
+                     latitude=df_canvass['lat'].mean(),
+                     longitude=df_canvass['lon'].mean(),
+                     zoom=14,
+                     pitch=0,
                  ),
-             ],
-         ))
+                 layers=[
+                     pdk.Layer(
+                         'ScatterplotLayer',
+                         data=df_canvass,
+                         get_position='[lon, lat]',
+                         get_color='[69, 47, 110]',
+                         get_radius=16,
+                         opacity=0.5,
+                     ),
+                 ],
+             ))
 
-        st.subheader('Raw data')
-        df_canvass_sort = df_canvass.sort_values(by=['lat','lon','address','unit']).drop(columns=['unit_acct_id','lat','lon']).reset_index(drop=True)
-        df = st.dataframe(df_canvass_sort)
+            st.subheader('Raw data, closest to furthest')
+            df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
+            df = st.dataframe(df_canvass_sort)
+        except:
+            data_load_state.text('No addresses found nearby. Please re-submit with a new address.')
