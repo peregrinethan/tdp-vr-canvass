@@ -92,11 +92,14 @@ if check_email():
         LIMIT 50
         """
 
-        data = pandas_gbq.read_gbq(unreg_query, credentials=credentials_bq)
-        data = data.assign(
-            lat=lambda df: df['lat'].astype(float),
-            lon=lambda df: df['lon'].astype(float)
-        )
+        try:
+            data = pandas_gbq.read_gbq(unreg_query, credentials=credentials_bq)
+            data = data.assign(
+                lat=lambda df: df['lat'].astype(float),
+                lon=lambda df: df['lon'].astype(float)
+            )
+        else:
+            data = 'No addresses found nearby. Please re-submit with a new address.'
 
         return data
 
@@ -134,12 +137,12 @@ if check_email():
     if submitted:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
-        try:
-            df_canvass = load_data(lon=lon, lat=lat)
-            data_load_state.text("")
+        df_canvass = load_data(lon=lon, lat=lat)
+        data_load_state.text("")
 
-            st.subheader(f'50 closest addresses to {addr}')
-            st.text('Addresses are indicated by puple dots on the map.\nYou may need to zoom in/out to get a better view.')
+        map_title = st.subheader(f'50 closest addresses to {addr}')
+        st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
+        try:
             st.pydeck_chart(pdk.Deck(
                  map_style='mapbox://styles/mapbox/streets-v11',
                  initial_view_state=pdk.ViewState(
@@ -159,9 +162,13 @@ if check_email():
                      ),
                  ],
              ))
+        except:
+            data_load_state.text('No addresses found nearby. Please re-submit with a new address.')
 
-            st.subheader('Raw data, closest to furthest')
+        raw_title = st.subheader('Raw data, closest to furthest')
+
+        try:
             df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
             df = st.dataframe(df_canvass_sort)
         except:
-            data_load_state.text('No addresses found nearby. Please re-submit with a new address.')
+            raw_title.subheader('')
