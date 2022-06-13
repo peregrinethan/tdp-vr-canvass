@@ -139,6 +139,7 @@ if check_email():
             data_load_state.text("")
 
             st.subheader(f'50 closest addresses to {addr}')
+            st.text('Addresses are indicated by puple dots on the map.\nYou may need to zoom in/out to get a better view.')
             st.pydeck_chart(pdk.Deck(
                  map_style='mapbox://styles/mapbox/streets-v11',
                  initial_view_state=pdk.ViewState(
@@ -153,8 +154,8 @@ if check_email():
                          data=df_canvass,
                          get_position='[lon, lat]',
                          get_color='[69, 47, 110]',
-                         get_radius=16,
-                         opacity=0.5,
+                         get_radius=20,
+                         opacity=0.75,
                      ),
                  ],
              ))
