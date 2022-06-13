@@ -130,7 +130,6 @@ if check_email():
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
-        # found = False
         if submitted:
             if city:
                 if check_zip(zip):
@@ -155,7 +154,7 @@ if check_email():
         data_load_state.text("")
 
         map_title = st.subheader(f'50 closest addresses to {addr}')
-        map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
+        map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view,\nespecially for areas that may be less densely populated.')
 
         if not df_canvass.empty:
             map = st.pydeck_chart(pdk.Deck(
