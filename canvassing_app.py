@@ -142,40 +142,41 @@ if check_email():
         data_load_state.text('Loading data...')
         df_canvass = load_data(lon=lon, lat=lat)
         data_load_state.text("")
+        st.write(df_canvass)
 
-        map_title = st.subheader(f'50 closest addresses to {addr}')
-        map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
-        try:
-            map = st.pydeck_chart(pdk.Deck(
-                 map_style='mapbox://styles/mapbox/streets-v11',
-                 initial_view_state=pdk.ViewState(
-                     latitude=df_canvass['lat'].mean(),
-                     longitude=df_canvass['lon'].mean(),
-                     zoom=14,
-                     pitch=0,
-                 ),
-                 layers=[
-                     pdk.Layer(
-                         'ScatterplotLayer',
-                         data=df_canvass,
-                         get_position='[lon, lat]',
-                         get_color='[69, 47, 110]',
-                         get_radius=20,
-                         opacity=0.75,
-                     ),
-                 ],
-             ))
-        except:
-            map_text.text('No addresses found nearby. Please re-submit with a new address.')
-            map.pydeck_chart(pdk.Deck(
-                 map_style='mapbox://styles/mapbox/streets-v11',
-                 initial_view_state=pdk.ViewState(
-                     latitude=29.76045940589561,
-                     longitude=-95.36945244285691,
-                     zoom=14,
-                     pitch=0,
-                 ),
-             ))
+        # map_title = st.subheader(f'50 closest addresses to {addr}')
+        # map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
+        # try:
+        #     map = st.pydeck_chart(pdk.Deck(
+        #          map_style='mapbox://styles/mapbox/streets-v11',
+        #          initial_view_state=pdk.ViewState(
+        #              latitude=df_canvass['lat'].mean(),
+        #              longitude=df_canvass['lon'].mean(),
+        #              zoom=14,
+        #              pitch=0,
+        #          ),
+        #          layers=[
+        #              pdk.Layer(
+        #                  'ScatterplotLayer',
+        #                  data=df_canvass,
+        #                  get_position='[lon, lat]',
+        #                  get_color='[69, 47, 110]',
+        #                  get_radius=20,
+        #                  opacity=0.75,
+        #              ),
+        #          ],
+        #      ))
+        # except:
+        #     map_text.text('No addresses found nearby. Please re-submit with a new address.')
+        #     map.pydeck_chart(pdk.Deck(
+        #          map_style='mapbox://styles/mapbox/streets-v11',
+        #          initial_view_state=pdk.ViewState(
+        #              latitude=29.76045940589561,
+        #              longitude=-95.36945244285691,
+        #              zoom=14,
+        #              pitch=0,
+        #          ),
+        #      ))
         #
         # raw_title = st.subheader('Raw data, closest to furthest')
         #
