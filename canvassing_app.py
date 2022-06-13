@@ -142,7 +142,7 @@ if check_email():
         data_load_state.text('Loading data...')
         df_canvass = load_data(lon=lon, lat=lat)
         data_load_state.text("")
-        st.write(df_canvass)
+        st.write(df_canvass.empty)
 
         # map_title = st.subheader(f'50 closest addresses to {addr}')
         # map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
