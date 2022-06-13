@@ -114,12 +114,12 @@ if check_email():
         return location.latitude, location.longitude, addr
 
     def check_zip(zip):
-        result = True
         try:
             int(zip)
-        except ValueError:
-            st.text('Zip must be numeric.')
+        except:
             result = False
+        else:
+            result = True
 
         return result
 
@@ -131,15 +131,22 @@ if check_email():
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
         if submitted:
-            if city and check_zip(zip):
-                not_found = False
-                try:
-                    lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-                except AttributeError:
-                    not_found = True
-                    st.text("Address not found. Try again.")
+            if city:
+                if check_zip(zip):
+                    try:
+                        geocode_add(address=address, city=city, zip=zip)
+                    except AttributeError:
+                        st.text("Address not found. Try again.")
+                        found = False
+                    else:
+                        lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
+                        found = True
+                else:
+                    st.text('Zip must be numeric.')
+            else:
+                st.text('Please enter a city')
 
-    if submitted and not not_found:
+    if submitted and found:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
         df_canvass = load_data(lon=lon, lat=lat)
@@ -169,7 +176,7 @@ if check_email():
                  ],
             ))
             raw_title = st.subheader('Raw data, closest to furthest')
-            df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
+            df_canvass_sort = df_canvass.sort_values(by=['distance', 'address', 'unit']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
             df = st.dataframe(df_canvass_sort)
 
         else:
