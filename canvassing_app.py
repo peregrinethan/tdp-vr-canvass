@@ -39,7 +39,7 @@ def check_email():
     """Returns `True` if the user is with an email we are aware of."""
 
     def email_entered():
-        """Checks whether a password entered by the user is correct."""
+        """Checks whether a email entered by the user is correct."""
         if st.session_state["email"] in ls:
             st.session_state["email_correct"] = True
             del st.session_state["email"]  # don't store password
@@ -48,12 +48,12 @@ def check_email():
 
     if "email_correct" not in st.session_state:
         st.text_input(
-            "Email", on_change=email_entered
+            "Email", on_change=email_entered, key='email'
         )
         return False
     elif not st.session_state["email_correct"]:
         st.text_input(
-            "Email", on_change=email_entered
+            "Email", on_change=email_entered, key='email'
         )
         st.error("Not authorized to enter. Please contact organizer.")
         return False
