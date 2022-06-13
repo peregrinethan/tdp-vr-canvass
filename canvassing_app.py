@@ -132,15 +132,12 @@ if check_email():
         submitted = st.form_submit_button("Submit")
         if submitted:
             if check_zip(zip):
-                found = True
                 try:
                     lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
                 except AttributeError:
                     st.text("Address not found. Try again.")
-                    found = False
-                    st.write(found)
 
-    if found:
+    if lat:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
         df_canvass = load_data(lon=lon, lat=lat)
