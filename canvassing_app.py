@@ -134,9 +134,10 @@ if check_email():
             if city and check_zip(zip):
                 try:
                     lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-                    not_found = False
                 except AttributeError:
-                    not_found = st.text("Address not found. Try again.")
+                    not_found = True
+                    st.text("Address not found. Try again.")
+                not_found = False
 
     if submitted and not not_found:
         app_title.title('Addresses and Locations to canvass')
