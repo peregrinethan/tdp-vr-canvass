@@ -165,11 +165,10 @@ if check_email():
                          opacity=0.75,
                      ),
                  ],
-             ))
-
-             raw_title = st.subheader('Raw data, closest to furthest')
-             df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
-             df = st.dataframe(df_canvass_sort)
+            ))
+            raw_title = st.subheader('Raw data, closest to furthest')
+            df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
+            df = st.dataframe(df_canvass_sort)
 
         else:
             map_text.text('No addresses found nearby. Please re-submit with a new address.')
