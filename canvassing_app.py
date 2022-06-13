@@ -98,7 +98,7 @@ if check_email():
                 lat=lambda df: df['lat'].astype(float),
                 lon=lambda df: df['lon'].astype(float)
             )
-        else:
+        except:
             data = 'No addresses found nearby. Please re-submit with a new address.'
 
         return data
