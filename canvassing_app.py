@@ -92,17 +92,14 @@ if check_email():
         LIMIT 50
         """
 
-        try:
-            data = (
-                pandas_gbq
-                .read_gbq(unreg_query, credentials=credentials_bq)
-                .assign(
-                    lat=lambda df: df['lat'].astype(float),
-                    lon=lambda df: df['lon'].astype(float)
-                )
+        data = (
+            pandas_gbq
+            .read_gbq(unreg_query, credentials=credentials_bq)
+            .assign(
+                lat=lambda df: df['lat'].astype(float),
+                lon=lambda df: df['lon'].astype(float)
             )
-        except:
-            data = 'No addresses found nearby. Please re-submit with a new address.'
+        )
 
         return data
 
@@ -119,8 +116,12 @@ if check_email():
     def check_zip(zip):
         try:
             int(zip)
+            result = True
         except ValueError:
             st.text('Please input only numeric values for zip code.')
+            result = False
+
+        return result
 
     with st.sidebar.form("start_address"):
         address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
@@ -130,12 +131,12 @@ if check_email():
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
         if submitted:
-            check_zip(zip)
-            try:
-                lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-            except AttributeError:
-                st.text("Address not found. Try again.")
-                submitted = False
+            if check_zip(zip):
+                try:
+                    lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
+                except AttributeError:
+                    st.text("Address not found. Try again.")
+                    submitted = False
 
     if submitted:
         app_title.title('Addresses and Locations to canvass')
@@ -171,13 +172,5 @@ if check_email():
             df = st.dataframe(df_canvass_sort)
 
         else:
-            map_text.text('No addresses found nearby. Please re-submit with a new address.')
-                # map.pydeck_chart(pdk.Deck(
-                #      map_style='mapbox://styles/mapbox/streets-v11',
-                #      initial_view_state=pdk.ViewState(
-                #          latitude=29.76045940589561,
-                #          longitude=-95.36945244285691,
-                #          zoom=14,
-                #          pitch=0,
-                #      ),
-                #  ))
+            mapt_title.subheader('No addresses found nearby. Please re-submit with a new address.')
+            map_text.text('')
