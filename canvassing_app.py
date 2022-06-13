@@ -134,10 +134,10 @@ if check_email():
             if check_zip(zip):
                 try:
                     lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-                    st.write(submitted)
                 except AttributeError:
                     st.text("Address not found. Try again.")
                     submitted = False
+                    st.write(submitted)
 
     if submitted:
         app_title.title('Addresses and Locations to canvass')
@@ -173,5 +173,5 @@ if check_email():
             df = st.dataframe(df_canvass_sort)
 
         else:
-            mapt_title.subheader('No addresses found nearby. Please re-submit with a new address.')
+            map_title.subheader('No addresses found nearby. Please re-submit with a new address.')
             map_text.text('')
