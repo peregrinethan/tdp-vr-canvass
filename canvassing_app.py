@@ -93,10 +93,13 @@ if check_email():
         """
 
         try:
-            data = pandas_gbq.read_gbq(unreg_query, credentials=credentials_bq)
-            data = data.assign(
-                lat=lambda df: df['lat'].astype(float),
-                lon=lambda df: df['lon'].astype(float)
+            data = (
+                pandas_gbq
+                .read_gbq(unreg_query, credentials=credentials_bq)
+                .assign(
+                    lat=lambda df: df['lat'].astype(float),
+                    lon=lambda df: df['lon'].astype(float)
+                )
             )
         except:
             data = 'No addresses found nearby. Please re-submit with a new address.'
@@ -141,9 +144,9 @@ if check_email():
         data_load_state.text("")
 
         map_title = st.subheader(f'50 closest addresses to {addr}')
-        st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
+        map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view.')
         try:
-            st.pydeck_chart(pdk.Deck(
+            map = st.pydeck_chart(pdk.Deck(
                  map_style='mapbox://styles/mapbox/streets-v11',
                  initial_view_state=pdk.ViewState(
                      latitude=df_canvass['lat'].mean(),
@@ -163,12 +166,21 @@ if check_email():
                  ],
              ))
         except:
-            data_load_state.text('No addresses found nearby. Please re-submit with a new address.')
-
-        raw_title = st.subheader('Raw data, closest to furthest')
-
-        try:
-            df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
-            df = st.dataframe(df_canvass_sort)
-        except:
-            raw_title.subheader('')
+            map_text.text('No addresses found nearby. Please re-submit with a new address.')
+            map.pydeck_chart(pdk.Deck(
+                 map_style='mapbox://styles/mapbox/streets-v11',
+                 initial_view_state=pdk.ViewState(
+                     latitude=29.76045940589561,
+                     longitude=-95.36945244285691,
+                     zoom=14,
+                     pitch=0,
+                 ),
+             ))
+        #
+        # raw_title = st.subheader('Raw data, closest to furthest')
+        #
+        # try:
+        #     df_canvass_sort = df_canvass.sort_values(by=['distance']).drop(columns=['unit_acct_id','lat','lon','distance']).reset_index(drop=True)
+        #     df = st.dataframe(df_canvass_sort)
+        # except:
+        #     raw_title.subheader('')
