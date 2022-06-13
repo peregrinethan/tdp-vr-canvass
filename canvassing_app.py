@@ -136,12 +136,11 @@ if check_email():
                 if check_zip(zip):
                     try:
                         geocode_add(address=address, city=city, zip=zip)
-                    except AttributeError:
+                    except:
                         st.text("Address not found. Try again.")
                         submitted = False
                     else:
                         lat, lon, addr = geocode_add(address=address, city=city, zip=zip)
-                        submitted = True
                 else:
                     st.text('Zip must be numeric.')
             else:
