@@ -185,7 +185,6 @@ if check_email():
         zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
         # radius_size = st.slider('size of dots', 0, 25, 9)
         housing_type = st.selectbox('Housing Type', ['Single Family', 'Mulitunit Complexes', 'Both'])
-        st.write(housing_type)
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
