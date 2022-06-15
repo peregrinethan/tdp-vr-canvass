@@ -65,9 +65,9 @@ if check_email():
     data_load_state = st.text("Please enter an address in the sidebar.\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
     def load_data(lon, lat, house_type):
-        if house_type == 'Single Family':
+        if str(house_type) == 'Single Family':
             house_tuple = ('single')
-        elif house_type == 'Mulitunit Complexes':
+        elif str(house_type) == 'Mulitunit Complexes':
             house_tuple = ('multiunit')
         else:
             house_tuple = ('single','multiunit')
@@ -233,10 +233,10 @@ if check_email():
                          filled=True,
                          radius_scale=2,
                          radius_min_pixels=0,
-                         radius_max_pixels=25,
+                         radius_max_pixels=30,
                          line_width_min_pixels=1,
                          get_position='[lon, lat]',
-                         get_radius=5,
+                         get_radius=15,
                          get_color='[69, 47, 110]',
                      ),
                  ],
