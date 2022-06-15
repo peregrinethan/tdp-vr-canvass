@@ -21,8 +21,6 @@ credentials_gs = service_account.Credentials.from_service_account_info(
 
 conn = connect(credentials=credentials_gs)
 
-single_fam_bool = True
-
 #### APP AND DISPLAY SETTINGS ####
 @st.cache(ttl=600, allow_output_mutation=True)
 def run_query(query):
@@ -66,7 +64,14 @@ if check_email():
     app_title = st.title('Which address will you start canvassing from?')
     data_load_state = st.text("Please enter an address in the sidebar.\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
-    def load_data(lon, lat, single_fam_bool):
+    def load_data(lon, lat, house_type):
+        if house_type == 'Single Family':
+            house_tuple = ('single')
+        elif house_type == 'Mulitunit Complexes':
+            house_tuple = ('multiunit')
+        else:
+            house_tuple = ('single','multiunit')
+
         unreg_query = f"""
         WITH addresses AS (SELECT
           p.unit_acct_id,
@@ -76,7 +81,7 @@ if check_email():
           unit,
           city,
           zip,
-          CASE WHEN unit IS NULL OR unit = '' THEN TRUE ELSE FALSE END AS single_family_bool,
+          CASE WHEN unit IS NULL OR unit = '' THEN 'single' ELSE 'multiunit' END AS house_type,
           ST_DISTANCE(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC))) AS distance
         FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
         JOIN (
@@ -109,7 +114,7 @@ if check_email():
           unit,
           city,
           zip,
-          CASE WHEN unit IS NULL OR unit = '' THEN TRUE ELSE FALSE END AS single_family_bool,
+          CASE WHEN unit IS NULL OR unit = '' THEN 'single' ELSE 'multiunit' END AS house_type,
           16000 AS distance
         FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
         JOIN (
@@ -132,13 +137,13 @@ if check_email():
             p.predicted_tdp_partisanship_range = "70-100"
             AND l.latitude IS NOT NULL
          )
-        (SELECT * EXCEPT (single_family_bool)
+        (SELECT * EXCEPT (house_type)
         FROM addresses
-        WHERE single_family_bool = {single_fam_bool}
+        WHERE house_type IN {house_tuple}
         UNION ALL
-        SELECT * EXCEPT (single_family_bool)
+        SELECT * EXCEPT (house_type)
         FROM addresses_precincts
-        WHERE single_family_bool = {single_fam_bool})
+        WHERE house_type IN {house_tuple})
         ORDER BY distance
         LIMIT 50
         """
@@ -178,7 +183,8 @@ if check_email():
         address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
         city = st.text_input(label='City', placeholder='ex: Houston')
         zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
-        radius_size = st.slider('size of dots', 0, 100, 15)
+        # radius_size = st.slider('size of dots', 0, 25, 9)
+        housing_type = st.selectbox('Housing Type', ['Single Family', 'Mulitunit Complexes', 'Both'],['Both'])
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
@@ -202,7 +208,7 @@ if check_email():
     if submitted:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
-        df_canvass = load_data(lon=lon, lat=lat, single_fam_bool=single_fam_bool)
+        df_canvass = load_data(lon=lon, lat=lat, house_type=housing_type)
         data_load_state.text("")
 
         map_title = st.subheader(f'50 closest addresses to {addr}')
@@ -225,12 +231,12 @@ if check_email():
                          opacity=0.7,
                          stroked=True,
                          filled=True,
-                         radius_scale=10,
-                         radius_min_pixels=1,
+                         radius_scale=2,
+                         radius_min_pixels=0,
                          radius_max_pixels=25,
                          line_width_min_pixels=1,
                          get_position='[lon, lat]',
-                         get_radius=radius_size,
+                         get_radius=5,
                          get_color='[69, 47, 110]',
                      ),
                  ],
