@@ -21,6 +21,8 @@ credentials_gs = service_account.Credentials.from_service_account_info(
 
 conn = connect(credentials=credentials_gs)
 
+single_fam_bool = True
+
 #### APP AND DISPLAY SETTINGS ####
 @st.cache(ttl=600)
 def run_query(query):
@@ -64,30 +66,79 @@ if check_email():
     app_title = st.title('Which address will you start canvassing from?')
     data_load_state = st.text("Please enter an address in the sidebar.\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
-    def load_data(lon, lat):
+    def load_data(lon, lat, single_fam_bool):
         unreg_query = f"""
         WITH addresses AS (SELECT
           p.unit_acct_id,
           l.latitude as lat,
           l.longitude as lon,
           appraisal_addr_parcel as address,
-          unit_type,
           unit,
           city,
           zip,
+          CASE WHEN unit IS NULL OR unit = '' THEN TRUE ELSE FALSE END AS single_family_bool,
           ST_DISTANCE(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC))) AS distance
         FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
-        JOIN `demstxsp.vr_data.harris_parcel_lat_lng` l
+        JOIN (
+          SELECT
+            ll.unit_acct_id,
+            ll.latitude,
+            ll.longitude,
+            LTRIM(p.PREC,'0') as precinct
+          FROM
+            `demstxsp.vr_data.harris_parcel_lat_lng` ll,
+            `demstxsp.geo.precincts_2022` p
+          WHERE
+            ST_CONTAINS(SAFE.ST_GEOGFROM(p.geometry), ST_GEOGPOINT(CAST(ll.longitude AS NUMERIC), CAST(ll.latitude AS NUMERIC)))
+            AND p.CNTY = 201
+        ) l
           USING (unit_acct_id)
         JOIN `demstxsp.vr_data.harris_address_parcel` a
           USING (unit_acct_id)
         WHERE
             p.predicted_tdp_partisanship_range = "70-100"
             AND l.latitude IS NOT NULL
-            AND ST_DWITHIN(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC)), 10000)
-        )
-        SELECT *
+            AND ST_DWITHIN(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC)), 16000)
+        ), addresses_precincts AS
+        (
+        SELECT
+          p.unit_acct_id,
+          l.latitude as lat,
+          l.longitude as lon,
+          appraisal_addr_parcel as address,
+          unit,
+          city,
+          zip,
+          CASE WHEN unit IS NULL OR unit = '' THEN TRUE ELSE FALSE END AS single_family_bool,
+          16000 AS distance
+        FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
+        JOIN (
+          SELECT
+            ll.unit_acct_id,
+            ll.latitude,
+            ll.longitude,
+            LTRIM(p.PREC,'0') as precinct
+          FROM
+            `demstxsp.vr_data.harris_parcel_lat_lng` ll,
+            `demstxsp.geo.precincts_2022` p
+          WHERE
+            ST_CONTAINS(SAFE.ST_GEOGFROM(p.geometry), ST_GEOGPOINT(CAST(ll.longitude AS NUMERIC), CAST(ll.latitude AS NUMERIC)))
+            AND p.CNTY = 201
+        ) l
+          USING (unit_acct_id)
+        JOIN `demstxsp.vr_data.harris_address_parcel` a
+          USING (unit_acct_id)
+        WHERE
+            p.predicted_tdp_partisanship_range = "70-100"
+            AND l.latitude IS NOT NULL
+         )
+        (SELECT * EXCEPT (single_family_bool)
         FROM addresses
+        WHERE single_family_bool = {single_fam_bool}
+        UNION ALL
+        SELECT * EXCEPT (single_family_bool)
+        FROM addresses_precincts
+        WHERE single_family_bool = {single_fam_bool})
         ORDER BY distance
         LIMIT 50
         """
@@ -150,7 +201,7 @@ if check_email():
     if submitted:
         app_title.title('Addresses and Locations to canvass')
         data_load_state.text('Loading data...')
-        df_canvass = load_data(lon=lon, lat=lat)
+        df_canvass = load_data(lon=lon, lat=lat, single_fam_bool=single_fam_bool)
         data_load_state.text("")
 
         map_title = st.subheader(f'50 closest addresses to {addr}')
@@ -171,7 +222,8 @@ if check_email():
                          data=df_canvass,
                          get_position='[lon, lat]',
                          get_color='[69, 47, 110]',
-                         get_radius=20,
+                         get_radius=5,
+                         radius_scale=10,
                          opacity=0.75,
                      ),
                  ],
