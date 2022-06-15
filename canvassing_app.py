@@ -206,6 +206,7 @@ if check_email():
 
         map_title = st.subheader(f'50 closest addresses to {addr}')
         map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view,\nespecially for areas that may be less densely populated.')
+        radius_size = st.slider('size of dots', 0, 100, 15)
 
         if not df_canvass.empty:
             map = st.pydeck_chart(pdk.Deck(
@@ -229,7 +230,7 @@ if check_email():
                          radius_max_pixels=60,
                          line_width_min_pixels=1,
                          get_position='[lon, lat]',
-                         get_radius=5,
+                         get_radius=radius_size,
                          get_color='[69, 47, 110]',
                      ),
                  ],
