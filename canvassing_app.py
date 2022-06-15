@@ -105,46 +105,46 @@ if check_email():
             AND l.latitude IS NOT NULL
             AND ST_DWITHIN(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC)), 16000)
         )
-        # , addresses_precincts AS
-        # (
-        # SELECT
-        #   p.unit_acct_id,
-        #   l.latitude as lat,
-        #   l.longitude as lon,
-        #   appraisal_addr_parcel as address,
-        #   unit,
-        #   city,
-        #   zip,
-        #   CASE WHEN unit IS NULL OR unit = '' THEN 'single' ELSE 'multiunit' END AS house_type,
-        #   16000 AS distance
-        # FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
-        # JOIN (
-        #   SELECT
-        #     ll.unit_acct_id,
-        #     ll.latitude,
-        #     ll.longitude,
-        #     LTRIM(p.PREC,'0') as precinct
-        #   FROM
-        #     `demstxsp.vr_data.harris_parcel_lat_lng` ll,
-        #     `demstxsp.geo.precincts_2022` p
-        #   WHERE
-        #     ST_CONTAINS(SAFE.ST_GEOGFROM(p.geometry), ST_GEOGPOINT(CAST(ll.longitude AS NUMERIC), CAST(ll.latitude AS NUMERIC)))
-        #     AND p.CNTY = 201
-        # ) l
-        #   USING (unit_acct_id)
-        # JOIN `demstxsp.vr_data.harris_address_parcel` a
-        #   USING (unit_acct_id)
-        # WHERE
-        #     p.predicted_tdp_partisanship_range = "70-100"
-        #     AND l.latitude IS NOT NULL
-        #  )
+        -- , addresses_precincts AS
+        -- (
+        -- SELECT
+        --   p.unit_acct_id,
+        --   l.latitude as lat,
+        --   l.longitude as lon,
+        --   appraisal_addr_parcel as address,
+        --   unit,
+        --   city,
+        --   zip,
+        --   CASE WHEN unit IS NULL OR unit = '' THEN 'single' ELSE 'multiunit' END AS house_type,
+        --   16000 AS distance
+        -- FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
+        -- JOIN (
+        --   SELECT
+        --     ll.unit_acct_id,
+        --     ll.latitude,
+        --     ll.longitude,
+        --     LTRIM(p.PREC,'0') as precinct
+        --   FROM
+        --     `demstxsp.vr_data.harris_parcel_lat_lng` ll,
+        --     `demstxsp.geo.precincts_2022` p
+        --   WHERE
+        --     ST_CONTAINS(SAFE.ST_GEOGFROM(p.geometry), ST_GEOGPOINT(CAST(ll.longitude AS NUMERIC), CAST(ll.latitude AS NUMERIC)))
+        --     AND p.CNTY = 201
+        -- ) l
+        --   USING (unit_acct_id)
+        -- JOIN `demstxsp.vr_data.harris_address_parcel` a
+        --   USING (unit_acct_id)
+        -- WHERE
+        --     p.predicted_tdp_partisanship_range = "70-100"
+        --     AND l.latitude IS NOT NULL
+        --  )
         (SELECT * EXCEPT (house_type)
         FROM addresses
         WHERE house_type IN {house_tuple}
-        # UNION ALL
-        # SELECT * EXCEPT (house_type)
-        # FROM addresses_precincts
-        # WHERE house_type IN {house_tuple}
+        -- UNION ALL
+        -- SELECT * EXCEPT (house_type)
+        -- FROM addresses_precincts
+        -- WHERE house_type IN {house_tuple}
         )
         ORDER BY distance
         LIMIT 50
@@ -230,7 +230,7 @@ if check_email():
                          'ScatterplotLayer',
                          data=df_canvass,
                          pickable=False,
-                         opacity=0.7,
+                         opacity=0.5,
                          stroked=True,
                          filled=True,
                          radius_scale=2,
@@ -238,7 +238,7 @@ if check_email():
                          radius_max_pixels=30,
                          line_width_min_pixels=1,
                          get_position='[lon, lat]',
-                         get_radius=15,
+                         get_radius=30,
                          get_color='[69, 47, 110]',
                      ),
                  ],
