@@ -178,6 +178,7 @@ if check_email():
         address = st.text_input(label='Street Address, excluding unit/apartment', placeholder='ex: 927 Dart St')
         city = st.text_input(label='City', placeholder='ex: Houston')
         zip = st.text_input(label='Zip5 Code', placeholder='ex: 77001', max_chars=5, help='5 digit zip code, must be numeric')
+        radius_size = st.slider('size of dots', 0, 100, 15)
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
@@ -206,7 +207,6 @@ if check_email():
 
         map_title = st.subheader(f'50 closest addresses to {addr}')
         map_text = st.text('Addresses are indicated by purple dots on the map.\nYou may need to zoom in/out to get a better view,\nespecially for areas that may be less densely populated.')
-        radius_size = st.slider('size of dots', 0, 100, 15)
 
         if not df_canvass.empty:
             map = st.pydeck_chart(pdk.Deck(
