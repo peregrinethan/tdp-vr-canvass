@@ -24,7 +24,7 @@ conn = connect(credentials=credentials_gs)
 single_fam_bool = True
 
 #### APP AND DISPLAY SETTINGS ####
-@st.cache(ttl=600)
+@st.cache(ttl=600, allow_output_mutation=True)
 def run_query(query):
     rows = conn.execute(query, headers=1)
     rows = rows.fetchall()
@@ -231,7 +231,6 @@ if check_email():
                          get_position='[lon, lat]',
                          get_radius=5,
                          get_color='[69, 47, 110]',
-                         tooltip="test test",
                      ),
                  ],
             ))
