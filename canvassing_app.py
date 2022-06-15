@@ -65,10 +65,10 @@ if check_email():
     data_load_state = st.text("Please enter an address in the sidebar.\nClick the arrow in the top left, if necessary, to show the sidebar.")
 
     def load_data(lon, lat, house_type):
-        if str(house_type) == 'Single Family':
-            house_tuple = ('single')
-        elif str(house_type) == 'Mulitunit Complexes':
-            house_tuple = ('multiunit')
+        if house_type == 'Single Family':
+            house_tuple = ('single', '')
+        elif house_type == 'Mulitunit Complexes':
+            house_tuple = ('multiunit', '')
         else:
             house_tuple = ('single','multiunit')
 
