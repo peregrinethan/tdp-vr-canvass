@@ -36,7 +36,10 @@ for row in rows:
     ls.append(row[0])
 
 def check_email():
-    """Returns `True` if the user is with an email we are aware of."""
+    """Returns `True` if the user is with an email we are aware of.
+    This was created as a quick workaround for a private/public request
+    from the team.
+    """
 
     def email_entered():
         """Checks whether a email entered by the user is correct."""
@@ -105,46 +108,9 @@ if check_email():
             AND l.latitude IS NOT NULL
             AND ST_DWITHIN(ST_GEOGPOINT({lon}, {lat}), ST_GEOGPOINT(CAST(l.longitude AS NUMERIC), CAST(l.latitude AS NUMERIC)), 16000)
         )
-        -- , addresses_precincts AS
-        -- (
-        -- SELECT
-        --   p.unit_acct_id,
-        --   l.latitude as lat,
-        --   l.longitude as lon,
-        --   appraisal_addr_parcel as address,
-        --   unit,
-        --   city,
-        --   zip,
-        --   CASE WHEN unit IS NULL OR unit = '' THEN 'single' ELSE 'multiunit' END AS house_type,
-        --   16000 AS distance
-        -- FROM `demstxsp.vr_data.harris_parcel_partisanship_predictions` p
-        -- JOIN (
-        --   SELECT
-        --     ll.unit_acct_id,
-        --     ll.latitude,
-        --     ll.longitude,
-        --     LTRIM(p.PREC,'0') as precinct
-        --   FROM
-        --     `demstxsp.vr_data.harris_parcel_lat_lng` ll,
-        --     `demstxsp.geo.precincts_2022` p
-        --   WHERE
-        --     ST_CONTAINS(SAFE.ST_GEOGFROM(p.geometry), ST_GEOGPOINT(CAST(ll.longitude AS NUMERIC), CAST(ll.latitude AS NUMERIC)))
-        --     AND p.CNTY = 201
-        -- ) l
-        --   USING (unit_acct_id)
-        -- JOIN `demstxsp.vr_data.harris_address_parcel` a
-        --   USING (unit_acct_id)
-        -- WHERE
-        --     p.predicted_tdp_partisanship_range = "70-100"
-        --     AND l.latitude IS NOT NULL
-        --  )
         (SELECT * EXCEPT (house_type)
         FROM addresses
         WHERE house_type IN {house_tuple}
-        -- UNION ALL
-        -- SELECT * EXCEPT (house_type)
-        -- FROM addresses_precincts
-        -- WHERE house_type IN {house_tuple}
         )
         ORDER BY distance
         LIMIT 50
@@ -162,9 +128,9 @@ if check_email():
         return data
 
     def geocode_add(address,city,zip):
-        '''This function takes an address in street number + street format, a city,
+        """This function takes an address in street number + street format, a city,
         and a zip, and returns the geocoded latitude and longitude.
-        '''
+        """
         addr = f'{address + " " + city + ", TX " + zip}'
         locator = Nominatim(user_agent="address_nearby")
         location = locator.geocode(f"{addr}")
@@ -172,6 +138,9 @@ if check_email():
         return location.latitude, location.longitude, addr
 
     def check_zip(zip):
+        """This function checks to ensure that the zip is an integer, 
+        returning False if it is not.
+        """
         try:
             int(zip)
         except:
